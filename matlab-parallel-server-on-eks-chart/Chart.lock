@@ -1,0 +1,9 @@
+dependencies:
+- name: mjs
+  repository: oci://ghcr.io/mathworks-ref-arch/matlab-parallel-server-k8s
+  version: 1.7.0
+- name: cluster-autoscaler
+  repository: https://kubernetes.github.io/autoscaler
+  version: 9.46.6
+digest: sha256:de22f7dec4ce57fe8e9b89767d54b90214247319e888cbde9ed94d3083ca4e41
+generated: "2025-12-10T16:19:05.869938524Z"

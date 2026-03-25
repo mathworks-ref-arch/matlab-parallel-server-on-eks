@@ -1,0 +1,145 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "global": {
+            "type": "object",
+            "properties": {
+                "nodeLabel": {
+                    "type": "object",
+                    "properties": {
+                        "key": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "The Kubernetes node label key used by node groups (e.g., mjs-node-type)."
+                        },
+                        "jobManagerValue": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "The label value applied to the Job Manager node group."
+                        },
+                        "workerValue": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "The label value applied to the Worker node group."
+                        }
+                    },
+                    "required": [
+                        "key",
+                        "jobManagerValue",
+                        "workerValue"
+                    ]
+                }
+            },
+            "required": [
+                "nodeLabel"
+            ]
+        },
+        "matlabPath": {
+            "type": "string",
+            "minLength": 1,
+            "description": "MATLAB local path"
+        },
+        "efsFilesystemID": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^fs-[0-9a-f]{8,40}$",
+            "description": "EFS filesystem ID is required"
+        },
+        "storage": {
+            "type": "object",
+            "properties": {
+                "efsStorageClassName": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Name of the EFS-backed StorageClass created by this chart."
+                }
+            }
+        },
+        "mjsAdmin": {
+            "type": "object",
+            "properties": {
+                "existingSecret": {
+                    "type": "string",
+                    "description": "Name of an existing secret that contains the MJS admin password."
+                }
+            }
+        },
+        "cluster-autoscaler": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "cloudProvider": {
+                    "type": "string",
+                    "enum": [
+                        "aws"
+                    ]
+                },
+                "awsRegion": {
+                    "type": "string",
+                    "pattern": "^(eu|us|us-gov|ap|ca|il|mx|me|sa|af)-(east|west|central|north|northeast|south|southeast)-(1|2|3|[0-4])$",
+                    "minLength": 1,
+                    "description": "AWS region must be set for cluster-autoscaler"
+                },
+                "autoDiscovery": {
+                    "type": "object",
+                    "description": "Autodiscovery settings for cluster-autoscaler",
+                    "properties": {
+                        "clusterName": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "pattern": "^[0-9A-Za-z][A-Za-z0-9\\-_]*$",
+                            "description": "Name of the EKS cluster to autoscale"
+                        }
+                    },
+                    "required": [
+                        "clusterName"
+                    ]
+                }
+            },
+            "required": [
+                "awsRegion"
+            ]
+        },
+        "mjs": {
+            "type": "object",
+            "properties": {
+                "matlabRelease": {
+                    "type": "string",
+                    "minLength": 6,
+                    "pattern": "^r20[0-9][0-9][ab]$",
+                    "description": "MATLAB release must be set for MJS"
+                },
+                "loadBalancerAnnotations": {
+                    "type": "object",
+                    "description": "Annotations for load balancer must be set",
+                    "properties": {
+                        "service.beta.kubernetes.io/load-balancer-source-ranges": {
+                            "type": "string",
+                            "minLength": 1,
+                            "description": "CIDR block for load balancer source ranges"
+                        }
+                    }
+                },
+                "maxWorkers": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Maximum number of MATLAB workers to allow in the cluster."
+                }
+            },
+            "required": [
+                "matlabRelease",
+                "loadBalancerAnnotations"
+            ]
+        }
+    },
+    "required": [
+        "global",
+        "efsFilesystemID",
+        "cluster-autoscaler",
+        "mjs"
+    ]
+}

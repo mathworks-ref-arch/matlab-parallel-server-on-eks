@@ -1,0 +1,60 @@
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============5475143322287857206=="
+
+--===============5475143322287857206==
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+
+#!/bin/bash
+set -uxo pipefail
+
+echo "===== Running custom USERDATA script ====="
+EBS_MOUNTPOINT=/mnt/ebs
+DEVICE_NAME=${DeviceName}
+
+# Mount EBS_MOUNTPOINT
+if ! mountpoint -q "$${EBS_MOUNTPOINT}"; then
+    mkdir -p "$${EBS_MOUNTPOINT}"
+    # Get block name of the first partition of the EBS device
+    # Resolve any symlink (e.g., /dev/sdb -> /dev/nvme0n1)
+    DEV_RESOLVED=$(readlink -f "$${DEVICE_NAME}")
+    
+    # If resolution failed or device doesn't exist, bail early
+    if [ -z "$${DEV_RESOLVED}" ] || [ ! -b "$${DEV_RESOLVED}" ]; then
+      echo "Error: $${DEVICE_NAME} does not resolve to a block device." >&2
+      exit 1
+    fi
+    
+    # Find the first partition on this device, if any (prefers full path)
+    FIRST_PARTITION=$(lsblk -rno PATH,TYPE "$${DEV_RESOLVED}" | awk '$2=="part"{print $1; exit}')
+    
+    # Choose partition if present; otherwise use the whole device
+    if [ -n "$${FIRST_PARTITION}" ]; then
+      EBS_DEVICE="$${FIRST_PARTITION}"
+    else
+      EBS_DEVICE="$${DEV_RESOLVED}"
+    fi
+
+    if [ -z "$${EBS_DEVICE}" ]; then
+         echo "No device found"; exit 1
+    fi
+    mount "$${EBS_DEVICE}" /mnt/ebs || { echo "Failed to mount EBS Device"; exit 1; }
+    
+    FSTAB_ENTRY="$${EBS_DEVICE} /mnt/ebs auto defaults,nofail 0 2" 
+    if ! grep -F -q "$${FSTAB_ENTRY}" /etc/fstab; then
+        echo "$${FSTAB_ENTRY}" >> /etc/fstab
+    fi
+fi
+
+MATLAB_ROOT=${MatlabRoot}
+if ! mountpoint -q "$${MATLAB_ROOT}"; then 
+    mkdir -p "$${MATLAB_ROOT}"
+    mount --bind /mnt/ebs/ "$${MATLAB_ROOT}" || { echo "Failed to mount EBS Device"; exit 1; }
+
+    FSTAB_ENTRY="/mnt/ebs/ $${MATLAB_ROOT} none bind,nofail 0 0" 
+    if ! grep -F -q "$${FSTAB_ENTRY}" /etc/fstab; then
+        echo "$${FSTAB_ENTRY}" >> /etc/fstab
+    fi
+fi
+echo "===== End custom USERDATA script ====="
+--===============5475143322287857206==--

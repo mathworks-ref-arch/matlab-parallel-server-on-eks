@@ -1,0 +1,99 @@
+# Copyright 2026 The MathWorks, Inc.
+
+# Default values of Kubernetes Parallel Server on EKS Chart
+# IMPORTANT: Replace all placeholders before deploying. Helm does not validate these automatically.
+
+# ---------------------------------------------------------------------
+# GLOBAL CONFIGURATION
+# ---------------------------------------------------------------------
+global:
+  nodeLabel:
+    # This key must match the labels set by Terraform for both node groups.
+    key: "mjs-node-type"
+    # Job Manager node group label value
+    jobManagerValue: "JobManagerNodeGroup"
+    # Worker node group label value
+    workerValue: "WorkerNodeGroup"
+
+# ---------------------------------------------------------------------
+# MATLAB filesystem path (used for mount binding)
+# ---------------------------------------------------------------------
+matlabPath: "/opt/matlab"
+
+# REQUIRED: replace with your EFS Fileystem ID (format fs-abcdef0123456789a)
+efsFilesystemID: "<EFS Filesystem ID>"
+
+storage:
+  efsStorageClassName: "efs-storage"
+
+mjsAdmin:
+  # If you have an existing secret for the MJS admin password, set it here by name.
+  # When set, the chart will NOT create new 'mjs-admin-password' secret.
+  existingSecret: ""
+
+# Subchart autoscaler
+cluster-autoscaler:
+  enabled: true
+  cloudProvider: "aws"
+  namespace: "kube-system"
+  # REQUIRED: replace with the AWS Region of your EKS cluster
+  awsRegion: "<AWS Region>" 
+  autoDiscovery:
+    # REQUIRED: replace with the Name of your EKS cluster
+    clusterName: "<EKS Cluster Name>"
+  extraArgs:
+    balance-similar-node-groups: true
+    expander: "least-waste"
+
+# Subchart mjs kubernetes
+mjs:
+  # REQUIRED: replace with the MATLAB release to use (format r2024b)
+  matlabRelease: "<MATLAB Release Name>" 
+
+  # Licensing settings
+  # To use the MATLAB Network License Manager (NLM), set useOnlineLicensing to false and set networkLicenseManager to your NLM server in the form <port@server>.
+  # You can deploy NLM on AWS from https://github.com/mathworks-ref-arch/license-manager-for-matlab-on-aws
+  useOnlineLicensing: true
+  #  networkLicenseManager: "27000@<hostname>"
+
+
+  # PersistentVolumeClaim settings
+  checkpointPVC: "checkpoint-pvc"
+  logPVC: "log-pvc"
+  workerLogPVC: "worker-log-pvc"
+  matlabPVC: "matlab-pvc"
+
+  # Security settings
+  # User ID and Group ID of the user account that MATLAB Job Scheduler uses to run the job manager pod. 
+  jobManagerUserID: 1000
+  jobManagerGroupID: 1000
+
+  # Restrict IP address at the load balancer level
+  loadBalancerAnnotations: 
+    # REQUIRED: replace with the CIDR block that can access your cluster (format 127.0.0.1/32)
+    service.beta.kubernetes.io/load-balancer-source-ranges: "<CIDR Block>"
+
+  # Cluster settings
+  maxWorkers: 4
+
+  # Image settings
+  matlabImage: "mathworks/matlab-deps"
+  # Leave blank to use the MATLAB release as the tag
+  matlabImageTag: ""
+
+# ------------------------------------------------------------------------------
+# Chart naming & labeling (optional)
+# ------------------------------------------------------------------------------
+fullnameOverride: ""     # Default: computed as:
+#                          #   - "<ReleaseName>-<ChartName>" (truncated to 63 chars), or
+#                          #   - "<ReleaseName>" if it already contains <ChartName>.
+#                          # If set, it directly sets metadata.name prefixes used by templates.
+
+componentLabel: ""
+#                          # Default: not set (label omitted).
+#                          # If set (e.g., "job-manager", "control-plane", "data-plane"),
+#                          # it adds app.kubernetes.io/component=<value> to all resources
+
+nameOverride: ""         # Default: use .Chart.Name (e.g., "mjs-eks-refarch")
+#                          # If set, this replaces .Chart.Name in labels like:
+#                          #   app.kubernetes.io/name: <nameOverride>

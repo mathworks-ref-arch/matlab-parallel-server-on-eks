@@ -1,0 +1,15 @@
+# Copyright 2026 The MathWorks, Inc.
+
+apiVersion: v2
+name: mjs-eks-refarch
+description: A Helm chart for running MATLAB Parallel Server in Kubernetes on EKS
+type: application
+version: 0.1.0
+appVersion: "0.7.0"
+dependencies:
+  - name: mjs
+    version: "1.7.0"
+    repository: "oci://ghcr.io/mathworks-ref-arch/matlab-parallel-server-k8s"
+  - name: cluster-autoscaler
+    version: "9.46.6"
+    repository: "https://kubernetes.github.io/autoscaler"

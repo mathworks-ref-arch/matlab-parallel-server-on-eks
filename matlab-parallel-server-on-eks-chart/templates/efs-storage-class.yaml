@@ -1,0 +1,15 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ default "efs-storage" .Values.storage.efsStorageClassName }}
+  labels:
+    {{- include "mjs-eks-refarch.labels" . | nindent 4 }}
+provisioner: efs.csi.aws.com
+mountOptions:
+  - tls
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: {{ .Values.efsFilesystemID }}  
+  directoryPerms: "700"
+  uid: "{{ .Values.mjs.jobManagerUserID | toString }}"
+  gid: "{{ .Values.mjs.jobManagerGroupID | toString }}"
