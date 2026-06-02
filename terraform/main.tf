@@ -175,6 +175,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     public_access_cidrs     = var.public_access_cidr_blocks
   }
 
+  tags = local.stack_tags
 }
 
 # --------------------------------------------
@@ -186,7 +187,7 @@ resource "aws_launch_template" "job_manager" {
   block_device_mappings {
     device_name = "/dev/xvda"
     ebs {
-      volume_size           = 20
+      volume_size           = 50
       volume_type           = "gp3"
       delete_on_termination = true
       encrypted             = true
@@ -267,6 +268,8 @@ resource "aws_eks_node_group" "job_manager" {
     value  = "true"
     effect = "NO_SCHEDULE"
   }
+
+  tags = local.stack_tags
 }
 
 resource "aws_eks_node_group" "worker" {
@@ -299,10 +302,10 @@ resource "aws_eks_node_group" "worker" {
     effect = "NO_SCHEDULE"
   }
 
-  tags = {
+  tags = merge(local.stack_tags, {
     "k8s.io/cluster-autoscaler/enabled"                        = "true"
     "k8s.io/cluster-autoscaler/${local.computed_cluster_name}" = "owned"
-  }
+  })
 }
 
 #--------------------------------------------

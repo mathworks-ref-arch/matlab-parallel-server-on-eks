@@ -10,6 +10,7 @@ locals {
       "R2024b" = {
         snapshot_id = "snap-0b21f2d2170e349ff"
       }
+
       "R2025a" = {
         snapshot_id = "snap-00cbca5502dce44de"
       }
@@ -17,11 +18,16 @@ locals {
       "R2025b" = {
         snapshot_id = "snap-07073395fde7beb7b"
       }
+
+      "R2026a" = {
+        snapshot_id = "snap-0e851484994dd8878"
+      }
     }
     "us-east-1" = {
       "R2024b" = {
         snapshot_id = "snap-0a0a9f223577f6264"
       }
+
       "R2025a" = {
         snapshot_id = "snap-07f2a77cb87a99951"
       }
@@ -29,18 +35,26 @@ locals {
       "R2025b" = {
         snapshot_id = "snap-0a4d33ed1517e7631"
       }
+
+      "R2026a" = {
+        snapshot_id = "snap-003281b5f7e2a45e8"
+      }
     }
 
     "us-west-2" = {
       "R2024b" = {
         snapshot_id = "snap-094fb8136ebee322b"
       }
+
       "R2025a" = {
         snapshot_id = "snap-0a3ad0300e394079a"
       }
-
       "R2025b" = {
         snapshot_id = "snap-0b29d445c298e36f9"
+      }
+
+      "R2026a" = {
+        snapshot_id = "snap-08ffef199b22d33c6"
       }
     }
 
@@ -48,12 +62,17 @@ locals {
       "R2024b" = {
         snapshot_id = "snap-003682cb5c8104ad1"
       }
+
       "R2025a" = {
         snapshot_id = "snap-0155966e9207d373c"
       }
 
       "R2025b" = {
         snapshot_id = "snap-0f284e28b4a4e0db0"
+      }
+
+      "R2026a" = {
+        snapshot_id = "snap-00c469aea1c1a3fc1"
       }
     }
 
@@ -75,5 +94,15 @@ locals {
 
 locals {
   cluster_sg_id = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+}
+
+# ------------------------
+# Computed tags (cannot go in provider default_tags because the value is not known at plan time)
+# ------------------------
+
+locals {
+  stack_tags = {
+    StackID = random_uuid.stackid.result
+  }
 }
 

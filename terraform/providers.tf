@@ -14,7 +14,6 @@ provider "aws" {
   default_tags {
     tags = {
       Creator = "mw-k8s-parallel-server-terraform"
-      StackID = random_uuid.stackid.result
     }
   }
 }

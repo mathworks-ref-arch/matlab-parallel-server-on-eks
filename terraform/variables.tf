@@ -29,11 +29,11 @@ variable "cluster_name" {
 variable "matlab_release" {
   description = "The matlab release to deploy"
   type        = string
-  default     = "R2025b"
+  default     = "R2026a"
 
   validation {
-    condition     = contains(["R2025b", "R2025a", "R2024b"], var.matlab_release)
-    error_message = "Release must be one of R2025b, R2025a, R2024b."
+    condition     = contains(["R2026a", "R2025b", "R2025a", "R2024b"], var.matlab_release)
+    error_message = "Release must be one of R2026a, R2025b, R2025a, R2024b."
   }
 }
 

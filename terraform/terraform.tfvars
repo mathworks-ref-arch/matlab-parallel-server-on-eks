@@ -8,8 +8,8 @@
 # Required variables
 # ------------------------
 
-# The MATLAB release to deploy. Allowed values: "R2025b", "R2025a", "R2024b"
-matlab_release = "R2025b"
+# The MATLAB release to deploy. Allowed values: "R2026a", "R2025b", "R2025a", "R2024b"
+matlab_release = "R2026a"
 
 # AWS region to deploy MATLAB Parallel Server.
 # Supported regions: "eu-west-1", "us-east-1", "us-west-2", "ap-northeast-1"

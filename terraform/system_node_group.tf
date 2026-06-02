@@ -59,4 +59,6 @@ resource "aws_eks_node_group" "system" {
   update_config {
     max_unavailable = 1
   }
+
+  tags = local.stack_tags
 }
